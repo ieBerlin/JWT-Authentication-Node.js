@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
+require('dotenv').config()
 const app = express();
-
+const authRoutes = require('./routes/authRoutes.js');
 // middleware
 app.use(express.static('public'));
 
@@ -10,11 +10,15 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // database connection
-const dbURI = 'mongodb+srv://shaun:test1234@cluster0.del96.mongodb.net/node-auth';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true })
-  .then((result) => app.listen(3000))
-  .catch((err) => console.log(err));
+const dbURI = process.env.MONGO_URI;
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+    .then((result) => {
+        console.log("Listening to port : 3000");
+        return app.listen(3000);
+    })
+    .catch((err) => console.log(err));
 
 // routes
 app.get('/', (req, res) => res.render('home'));
 app.get('/smoothies', (req, res) => res.render('smoothies'));
+app.use(authRoutes)
